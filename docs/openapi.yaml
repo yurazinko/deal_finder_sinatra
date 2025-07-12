@@ -1,0 +1,159 @@
+openapi: 3.0.3
+info:
+  title: Deal Finder API
+  description: |
+    A simple API for searching and ranking deals based on user preferences.
+    Deals are loaded from a static JSON file and filtered in-memory using business logic.
+  version: 1.0.0
+servers:
+  - url: http://localhost:4567
+paths:
+  /deals/search:
+    get:
+      summary: Search and rank deals
+      description: Returns a list of filtered and ranked deals based on price, category, tags, and location.
+      parameters:
+        - in: query
+          name: lat
+          schema:
+            type: number
+            format: float
+          required: false
+          description: User's latitude for distance scoring
+        - in: query
+          name: lng
+          schema:
+            type: number
+            format: float
+          required: false
+          description: User's longitude for distance scoring
+        - in: query
+          name: min_price
+          schema:
+            type: number
+            format: float
+          required: false
+          description: Minimum price filter
+        - in: query
+          name: max_price
+          schema:
+            type: number
+            format: float
+          required: false
+          description: Maximum price filter
+        - in: query
+          name: category
+          schema:
+            type: string
+          required: false
+          description: Deal category (e.g., "Food & Drink")
+        - in: query
+          name: tags
+          schema:
+            type: array
+            items:
+              type: string
+          required: false
+          style: form
+          explode: true
+          description: Tags to match (all must be present in a deal)
+      responses:
+        '200':
+          description: A list of matching deals, ranked by score
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Deal'
+
+components:
+  schemas:
+    Location:
+      type: object
+      properties:
+        lat:
+          type: number
+          format: float
+        lng:
+          type: number
+          format: float
+        address:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        zip_code:
+          type: string
+
+    RedemptionLocation:
+      type: object
+      properties:
+        id:
+          type: string
+        lat:
+          type: number
+        lng:
+          type: number
+        address:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        zip_code:
+          type: string
+
+    Deal:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        original_price:
+          type: number
+        discount_price:
+          type: number
+        discount_percentage:
+          type: integer
+        category:
+          type: string
+        subcategory:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        location:
+          $ref: '#/components/schemas/Location'
+        merchant_name:
+          type: string
+        merchant_rating:
+          type: number
+        quantity_sold:
+          type: integer
+        expiry_date:
+          type: string
+          format: date
+        featured_deal:
+          type: boolean
+        image_url:
+          type: string
+        redemption_locations:
+          type: array
+          items:
+            $ref: '#/components/schemas/RedemptionLocation'
+        fine_print:
+          type: string
+        review_count:
+          type: integer
+        average_rating:
+          type: number
+        available_quantity:
+          type: integer
+        score:
+          type: number
